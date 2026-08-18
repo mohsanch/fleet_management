@@ -11,6 +11,22 @@
     
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="{{ asset('css/purity.css') }}">
+
+    <!-- Loader Style -->
+    <style>
+        .global-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(79, 209, 197, 0.15);
+            border-top-color: #4fd1c5;
+            border-radius: 50%;
+            animation: global-spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes global-spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
     <div class="auth-container">
@@ -74,5 +90,33 @@
             </div>
         </div>
     </div>
+
+    <!-- Global Loader Overlay -->
+    <div id="global-loader" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 255, 255, 0.85); z-index: 999999; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+        <div class="global-spinner"></div>
+        <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-color); letter-spacing: 0.5px;">Loading, please wait...</span>
+    </div>
+
+    <!-- Global Loader Activation -->
+    <script>
+        // Show loader on page navigation/unload
+        window.addEventListener('beforeunload', function() {
+            document.getElementById('global-loader').style.display = 'flex';
+        });
+
+        // Show loader on form submission
+        document.addEventListener('submit', function(e) {
+            if (!e.defaultPrevented) {
+                document.getElementById('global-loader').style.display = 'flex';
+            }
+        });
+
+        // Hide loader if page is loaded from cache (e.g. back button)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                document.getElementById('global-loader').style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

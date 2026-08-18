@@ -13,7 +13,17 @@ class Driver extends Model
 {
     use BelongsToBranch;
 
-    protected $fillable = ['name', 'contact', 'base_salary', 'status', 'branch_id'];
+    protected $fillable = ['name', 'contact', 'phone', 'base_salary', 'status', 'license_number', 'branch_id'];
+
+    public function getPhoneAttribute()
+    {
+        return $this->contact;
+    }
+
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['contact'] = $value;
+    }
 
     public function assignments(): HasMany
     {

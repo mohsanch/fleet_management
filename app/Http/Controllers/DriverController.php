@@ -69,14 +69,19 @@ class DriverController extends Controller
 
     public function update(Request $request, Driver $driver)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'license_number' => ['required', 'string', 'max:255', 'unique:drivers,license_number,' . $driver->id],
-            'phone' => ['required', 'string', 'max:255'],
-            'base_salary' => ['required', 'numeric', 'min:0'],
-            'status' => ['required', 'string', 'in:active,inactive,suspended'],
-            'branch_id' => ['nullable', 'exists:branches,id'],
-        ]);
+        try {
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'license_number' => ['required', 'string', 'max:255', 'unique:drivers,license_number,' . $driver->id],
+                'phone' => ['required', 'string', 'max:255'],
+                'base_salary' => ['required', 'numeric', 'min:0'],
+                'status' => ['required', 'string', 'in:active,inactive,suspended'],
+                'branch_id' => ['nullable', 'exists:branches,id'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Driver update validation failed: ' . json_encode($e->errors()));
+            throw $e;
+        }
 
         $driver->update([
             'name' => $request->name,
