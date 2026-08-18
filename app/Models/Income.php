@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Traits\BelongsToBranch;
+
 class Income extends Model
 {
-    use SoftDeletes;
-    protected $fillable = ['category_id', 'amount', 'date', 'description', 'reference_source', 'created_by'];
+    use SoftDeletes, BelongsToBranch;
+    protected $fillable = ['category_id', 'amount', 'date', 'description', 'reference_source', 'created_by', 'branch_id'];
 
     public function category(): BelongsTo
     {

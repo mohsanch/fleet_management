@@ -16,3 +16,16 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
+
+if (!function_exists('activity_log')) {
+    function activity_log($action, $reason = null, $model = null, $details = null) {
+        \App\Models\ActivityLog::create([
+            'user_id'    => auth()->id() ?? 1,
+            'action'     => $action,
+            'reason'     => $reason,
+            'model_type' => $model ? get_class($model) : null,
+            'model_id'   => $model ? $model->id : null,
+            'details'    => $details,
+        ]);
+    }
+}

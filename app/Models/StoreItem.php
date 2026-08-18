@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\BelongsToBranch;
 
 class StoreItem extends Model
 {
-    use SoftDeletes;
-    protected $fillable = ['item_name', 'quantity', 'amount', 'date', 'vehicle_id', 'vendor', 'remarks', 'created_by'];
+    use SoftDeletes, BelongsToBranch;
+    protected $fillable = ['item_name', 'quantity', 'amount', 'date', 'vehicle_id', 'vendor', 'remarks', 'created_by', 'branch_id'];
 
     public function vehicle(): BelongsTo
     {

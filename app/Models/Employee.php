@@ -5,9 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\BelongsToBranch;
+
 class Employee extends Model
 {
-    protected $fillable = ['name', 'designation', 'contact', 'base_salary', 'status'];
+    use BelongsToBranch;
+
+    protected $fillable = ['name', 'designation', 'contact', 'base_salary', 'status', 'branch_id'];
 
     public function advances(): HasMany
     {

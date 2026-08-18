@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Branch;
 use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +13,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::with('roles')
+        $users = User::with(['roles', 'branch'])
             ->when($request->search, fn($q) => $q->where(fn($sub) => $sub->where('name', 'like', "%{$request->search}%")
                 ->orWhere('email', 'like', "%{$request->search}%")))
             ->when($request->role, fn($q) => $q->whereHas('roles', fn($r) => $r->where('name', $request->role)))
@@ -28,9 +29,10 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
+        $branches = Branch::where('is_active', true)->get();
         // Derive user_types dynamically from roles (snake_case)
         $userTypes = $roles->map(fn($r) => strtolower(str_replace(' ', '_', $r->name)))->unique()->values();
-        return view('users.create', compact('roles', 'userTypes'));
+        return view('users.create', compact('roles', 'userTypes', 'branches'));
     }
 
     public function store(Request $request)
@@ -44,6 +46,7 @@ class UserController extends Controller
             'user_type' => ['required', 'string', 'in:' . implode(',', $validUserTypes)],
             'is_active' => ['required', 'boolean'],
             'role'      => ['required', 'string', 'exists:roles,name'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
 
         $user = User::create([
@@ -52,6 +55,7 @@ class UserController extends Controller
             'password'  => Hash::make($request->password),
             'user_type' => $request->user_type,
             'is_active' => $request->is_active,
+            'branch_id' => $request->branch_id,
         ]);
 
         $user->assignRole($request->role);
@@ -64,9 +68,10 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::all();
+        $branches = Branch::where('is_active', true)->get();
         $userTypes = $roles->map(fn($r) => strtolower(str_replace(' ', '_', $r->name)))->unique()->values();
         $userRole = $user->roles->first()?->name;
-        return view('users.edit', compact('user', 'roles', 'userTypes', 'userRole'));
+        return view('users.edit', compact('user', 'roles', 'userTypes', 'userRole', 'branches'));
     }
 
     public function update(Request $request, User $user)
@@ -80,6 +85,7 @@ class UserController extends Controller
             'user_type' => ['required', 'string', 'in:' . implode(',', $validUserTypes)],
             'is_active' => ['required', 'boolean'],
             'role'      => ['required', 'string', 'exists:roles,name'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
 
         $data = [
@@ -87,6 +93,7 @@ class UserController extends Controller
             'email'     => $request->email,
             'user_type' => $request->user_type,
             'is_active' => $request->is_active,
+            'branch_id' => $request->branch_id,
         ];
 
         if ($request->filled('password')) {

@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\BelongsToBranch;
 
 class EmployeeAdvance extends Model
 {
-    use SoftDeletes;
-    protected $fillable = ['employee_id', 'amount', 'date', 'remarks', 'created_by'];
+    use SoftDeletes, BelongsToBranch;
+    protected $fillable = ['employee_id', 'amount', 'date', 'remarks', 'created_by', 'branch_id'];
 
     public function employee(): BelongsTo
     {

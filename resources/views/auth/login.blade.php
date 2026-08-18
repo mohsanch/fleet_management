@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sign In - Purity UI Dashboard</title>
+    <title>Sign In - Fleet Management</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234fd1c5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2'/%3E%3Cpath d='M19 18h2a1 1 0 0 0 1-1v-5.14a2 2 0 0 0-.586-1.414l-2.83-2.83A2 2 0 0 0 17.17 7H14'/%3E%3Ccircle cx='7.5' cy='18.5' r='2.5'/%3E%3Ccircle cx='17.5' cy='18.5' r='2.5'/%3E%3C/svg%3E">
     
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="{{ asset('css/purity.css') }}">
@@ -33,7 +36,7 @@
                 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" name="email" id="email" class="form-input" placeholder="superadmin@fleet.local" value="{{ old('email') }}" required autofocus>
+                    <input type="email" name="email" id="email" class="form-input" placeholder="Your email" value="{{ old('email') }}" required autofocus>
                     @error('email')
                         <span class="form-error">{{ $message }}</span>
                     @enderror

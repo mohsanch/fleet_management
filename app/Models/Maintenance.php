@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Traits\BelongsToBranch;
+
 class Maintenance extends Model
 {
-    use SoftDeletes;
-    protected $fillable = ['vehicle_id', 'maintenance_date', 'maintenance_type', 'amount', 'vendor', 'invoice_number', 'remarks', 'created_by'];
+    use SoftDeletes, BelongsToBranch;
+    protected $fillable = ['vehicle_id', 'maintenance_date', 'maintenance_type', 'amount', 'vendor', 'invoice_number', 'remarks', 'created_by', 'branch_id'];
 
     public function vehicle(): BelongsTo
     {

@@ -8,9 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\BelongsToBranch;
+
 class Vehicle extends Model
 {
-    protected $fillable = ['vehicle_number', 'registration_name', 'type', 'assigned_driver_id', 'status'];
+    use BelongsToBranch;
+
+    protected $fillable = ['vehicle_number', 'registration_name', 'type', 'assigned_driver_id', 'status', 'branch_id'];
 
     protected static function booted()
     {

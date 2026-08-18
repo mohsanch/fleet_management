@@ -7,9 +7,13 @@ use App\Models\Attachment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\BelongsToBranch;
+
 class Driver extends Model
 {
-    protected $fillable = ['name', 'contact', 'base_salary', 'status'];
+    use BelongsToBranch;
+
+    protected $fillable = ['name', 'contact', 'base_salary', 'status', 'branch_id'];
 
     public function assignments(): HasMany
     {

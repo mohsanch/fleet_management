@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Traits\BelongsToBranch;
+
 class FleetDailyData extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToBranch;
     protected $fillable = [
         'date', 'vehicle_id', 'driver_id', 'pasgi_given', 
         'daily_diesel_amount', 'daily_diesel_liters', 
-        'main_km', 'local_km', 'total_km', 'remarks', 'created_by'
+        'main_km', 'local_km', 'total_km', 'remarks', 'created_by', 'branch_id'
     ];
 
     protected static function boot()

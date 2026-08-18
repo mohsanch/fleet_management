@@ -74,6 +74,21 @@
         </div>
 
         <div class="form-group">
+            <label for="branch_id">Assign Branch (leave blank for Global/All)</label>
+            <select name="branch_id" id="branch_id" class="form-input" style="height: 48px; padding: 10px 20px;">
+                <option value="">Global (All Branches)</option>
+                @foreach($branches as $branch)
+                    <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>
+                        {{ $branch->name }} ({{ $branch->code }})
+                    </option>
+                @endforeach
+            </select>
+            @error('branch_id')
+                <span class="form-error">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="form-group">
             <label for="is_active">Status</label>
             <select name="is_active" id="is_active" class="form-input" style="height: 48px; padding: 10px 20px;" required>
                 <option value="1" {{ old('is_active') === '1' || old('is_active') === null ? 'selected' : '' }}>Active (Can login)</option>

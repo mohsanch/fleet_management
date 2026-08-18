@@ -92,6 +92,7 @@
                 <tr>
                     <th>User</th>
                     <th>Role</th>
+                    <th>Branch</th>
                     <th>Permissions</th>
                     <th>Status</th>
                     <th style="text-align:right;">Actions</th>
@@ -118,6 +119,17 @@
                         </span>
                         @else
                         <span style="color:var(--text-muted);font-size:11px;">No role</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($user->branch)
+                            <span class="badge info" style="font-size: 10px;">
+                                {{ $user->branch->name }}
+                            </span>
+                        @else
+                            <span class="badge" style="background: #EDF2F7; color: #4A5568; font-size: 10px;">
+                                Global (All)
+                            </span>
                         @endif
                     </td>
                     <td>

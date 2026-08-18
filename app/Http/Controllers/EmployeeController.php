@@ -35,6 +35,7 @@ class EmployeeController extends Controller
             'contact' => ['nullable', 'string', 'max:255'],
             'base_salary' => ['required', 'numeric', 'min:0'],
             'status' => ['required', 'string', 'in:active,inactive'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
 
         Employee::create([
@@ -43,6 +44,7 @@ class EmployeeController extends Controller
             'contact' => $request->contact,
             'base_salary' => $request->base_salary,
             'status' => $request->status,
+            'branch_id' => $request->branch_id,
         ]);
 
         return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
@@ -61,6 +63,7 @@ class EmployeeController extends Controller
             'contact' => ['nullable', 'string', 'max:255'],
             'base_salary' => ['required', 'numeric', 'min:0'],
             'status' => ['required', 'string', 'in:active,inactive'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
 
         $employee->update([
@@ -69,6 +72,7 @@ class EmployeeController extends Controller
             'contact' => $request->contact,
             'base_salary' => $request->base_salary,
             'status' => $request->status,
+            'branch_id' => $request->branch_id,
         ]);
 
         return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');

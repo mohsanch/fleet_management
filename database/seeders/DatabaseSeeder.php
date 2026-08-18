@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Driver;
 use App\Models\Vehicle;
@@ -65,6 +66,8 @@ class DatabaseSeeder extends Seeder
             'daily-data'   => ['view', 'create', 'edit', 'delete', 'approve', 'export'],
             'maintenance'  => ['view', 'create', 'edit', 'delete', 'export'],
             'store'        => ['view', 'create', 'edit', 'delete', 'export'],
+            'incomes'      => ['view', 'create', 'edit', 'delete'],
+            'expenses'     => ['view', 'create', 'edit', 'delete'],
             'finance'      => ['view', 'create', 'edit', 'delete', 'export'],
             'payroll'      => ['view', 'create', 'edit', 'delete', 'export'],
             'advances'     => ['view', 'create', 'edit', 'delete', 'export'],
@@ -109,9 +112,10 @@ class DatabaseSeeder extends Seeder
         });
         $staffRole->syncPermissions($staffPerms);
 
-        // Accountant gets legacy financials, and finance/payroll/advances modules
+        // Accountant gets legacy financials, and expenses/finance/payroll/advances modules
         $accountantPerms = array_filter($allPermNames, function($name) {
-            return str_starts_with($name, 'finance.') 
+            return str_starts_with($name, 'expenses.')
+                || str_starts_with($name, 'finance.') 
                 || str_starts_with($name, 'payroll.') 
                 || str_starts_with($name, 'advances.') 
                 || str_starts_with($name, 'reports.');
@@ -141,38 +145,104 @@ class DatabaseSeeder extends Seeder
         ));
 
         // 2. Seed Default Users
-        $superAdmin = User::firstOrCreate(
-            ['email' => 'superadmin@fleet.local'],
-            [
-                'name' => 'Super Admin User',
-                'password' => Hash::make('password'),
-                'is_active' => true,
-                'user_type' => 'super_admin'
-            ]
-        );
-        $superAdmin->assignRole($superAdminRole);
+        $swlBranchId = Branch::where('code', 'SWL')->value('id');
+        $skpBranchId = Branch::where('code', 'SKP')->value('id');
 
-        $accountant = User::firstOrCreate(
-            ['email' => 'accountant@fleet.local'],
+        // 2. Seed Custom Users List
+        $usersToSeed = [
             [
-                'name' => 'Accountant User',
-                'password' => Hash::make('password'),
+                'name' => 'Mohsan',
+                'email' => 'mohsan@gmail.com',
+                'password' => Hash::make('123456789'),
                 'is_active' => true,
-                'user_type' => 'accountant'
-            ]
-        );
-        $accountant->assignRole($accountantRole);
+                'user_type' => 'super_admin',
+                'branch_id' => null,
+                'role' => $superAdminRole,
+            ],
+            [
+                'name' => 'Parvaze',
+                'email' => 'parvaze@gmail.com',
+                'password' => Hash::make('123456789'),
+                'is_active' => true,
+                'user_type' => 'admin',
+                'branch_id' => null,
+                'role' => $adminRole,
+            ],
+            [
+                'name' => 'Mazhar',
+                'email' => 'mazhar@gmail.com',
+                'password' => Hash::make('123456789'),
+                'is_active' => true,
+                'user_type' => 'admin',
+                'branch_id' => null,
+                'role' => $adminRole,
+            ],
+            [
+                'name' => 'Ahmad',
+                'email' => 'ahmad@gmail.com',
+                'password' => Hash::make('123456789'),
+                'is_active' => true,
+                'user_type' => 'accountant',
+                'branch_id' => null,
+                'role' => $accountantRole,
+            ],
+            [
+                'name' => 'Allah Rakkha',
+                'email' => 'allahrakkha@gmail.com',
+                'password' => Hash::make('123456789'),
+                'is_active' => true,
+                'user_type' => 'accountant',
+                'branch_id' => null,
+                'role' => $accountantRole,
+            ],
+            [
+                'name' => 'Zeshan',
+                'email' => 'zeshan@gmail.com',
+                'password' => Hash::make('123456789'),
+                'is_active' => true,
+                'user_type' => 'staff',
+                'branch_id' => $swlBranchId,
+                'role' => $staffRole,
+            ],
+            [
+                'name' => 'Usama',
+                'email' => 'usama@gmail.com',
+                'password' => Hash::make('123456789'),
+                'is_active' => true,
+                'user_type' => 'staff',
+                'branch_id' => $skpBranchId,
+                'role' => $staffRole,
+            ],
+            [
+                'name' => 'Ali Hamza',
+                'email' => 'alihamza@gmail.com',
+                'password' => Hash::make('123456789'),
+                'is_active' => true,
+                'user_type' => 'staff',
+                'branch_id' => $skpBranchId,
+                'role' => $staffRole,
+            ],
+            [
+                'name' => 'Qasim',
+                'email' => 'qasim@gmail.com',
+                'password' => Hash::make('123456789'),
+                'is_active' => true,
+                'user_type' => 'staff',
+                'branch_id' => $skpBranchId,
+                'role' => $staffRole,
+            ],
+        ];
 
-        $dataEntry = User::firstOrCreate(
-            ['email' => 'dataentry@fleet.local'],
-            [
-                'name' => 'Data Entry User',
-                'password' => Hash::make('password'),
-                'is_active' => true,
-                'user_type' => 'staff'
-            ]
-        );
-        $dataEntry->assignRole($dataEntryRole);
+        foreach ($usersToSeed as $userData) {
+            $role = $userData['role'];
+            unset($userData['role']);
+            
+            $user = User::updateOrCreate(
+                ['email' => $userData['email']],
+                $userData
+            );
+            $user->assignRole($role);
+        }
 
         // 3. Seed Settings
         Setting::updateOrCreate(['key' => 'fuel_price_per_liter'], ['value' => '272.50']);
@@ -194,292 +264,5 @@ class DatabaseSeeder extends Seeder
             'Office Expenses' => Category::firstOrCreate(['name' => 'Office Expenses', 'type' => 'expense']),
             'Other Expense' => Category::firstOrCreate(['name' => 'Other Expense', 'type' => 'expense']),
         ];
-
-        // 5. Seed Drivers
-        $driversData = [
-            ['name' => 'Sajid Khan', 'contact' => '0300-1234567', 'base_salary' => 45000, 'status' => 'active'],
-            ['name' => 'Imran Ali', 'contact' => '0312-9876543', 'base_salary' => 40000, 'status' => 'active'],
-            ['name' => 'Muhammad Bilal', 'contact' => '0333-5555555', 'base_salary' => 50000, 'status' => 'active'],
-            ['name' => 'Waqas Ahmed', 'contact' => '0345-4444444', 'base_salary' => 42000, 'status' => 'active'],
-            ['name' => 'Zahid Mehmood', 'contact' => '0321-7777777', 'base_salary' => 38000, 'status' => 'active'],
-        ];
-
-        $drivers = [];
-        foreach ($driversData as $dData) {
-            $drivers[] = Driver::firstOrCreate(['name' => $dData['name']], $dData);
-        }
-
-        // 6. Seed Vehicles
-        $vehiclesData = [
-            ['vehicle_number' => 'LHR-9842', 'registration_name' => 'Hino Truck', 'type' => 'Heavy Duty', 'assigned_driver_id' => $drivers[0]->id, 'status' => 'active'],
-            ['vehicle_number' => 'KHI-1102', 'registration_name' => 'Isuzu D-Max', 'type' => 'Light Commercial', 'assigned_driver_id' => $drivers[1]->id, 'status' => 'active'],
-            ['vehicle_number' => 'ISB-5421', 'registration_name' => 'Volvo FH16', 'type' => 'Trailer', 'assigned_driver_id' => $drivers[2]->id, 'status' => 'inactive'],
-            ['vehicle_number' => 'PEW-7783', 'registration_name' => 'Foton Auman', 'type' => 'Heavy Cargo', 'assigned_driver_id' => $drivers[3]->id, 'status' => 'active'],
-            ['vehicle_number' => 'MUL-3329', 'registration_name' => 'Hino Ranger', 'type' => 'Medium Duty', 'assigned_driver_id' => $drivers[4]->id, 'status' => 'active'],
-        ];
-
-        $vehicles = [];
-        foreach ($vehiclesData as $vData) {
-            $vehicles[] = Vehicle::firstOrCreate(['vehicle_number' => $vData['vehicle_number']], $vData);
-        }
-
-        // 7. Seed Driver Vehicle Assignment History
-        foreach ($vehicles as $key => $vehicle) {
-            DriverVehicleAssignment::firstOrCreate(
-                [
-                    'vehicle_id' => $vehicle->id,
-                    'driver_id' => $vehicle->assigned_driver_id,
-                    'assigned_from' => Carbon::now()->subMonths(3)->toDateString(),
-                ],
-                [
-                    'assigned_to' => null
-                ]
-            );
-        }
-
-        // 8. Seed Incomes, Expenses, Maintenances, and Daily Data over last 30 days
-        $startDate = Carbon::now()->subDays(30);
-
-        for ($i = 0; $i < 30; $i++) {
-            $date = $startDate->copy()->addDays($i);
-            $formattedDate = $date->toDateString();
-
-            // Seed daily incomes on some days
-            if ($i % 2 === 0) {
-                Income::create([
-                    'category_id' => $incomeCats['Freight Delivery']->id,
-                    'amount' => rand(60000, 120000),
-                    'date' => $formattedDate,
-                    'description' => 'Completed delivery trip #' . rand(100, 999),
-                    'reference_source' => 'Client Invoice #' . (5000 + $i),
-                    'created_by' => $superAdmin->id
-                ]);
-            }
-            if ($i % 3 === 0) {
-                Income::create([
-                    'category_id' => $incomeCats['Container Cargo']->id,
-                    'amount' => rand(80000, 150000),
-                    'date' => $formattedDate,
-                    'description' => 'Container Logistics Cargo delivery',
-                    'reference_source' => 'Client Invoice #' . (6000 + $i),
-                    'created_by' => $superAdmin->id
-                ]);
-            }
-
-            // Seed general expenses (office utility, store, etc.) on some days
-            if ($i % 5 === 0) {
-                Expense::create([
-                    'category_id' => $expenseCats['Office Expenses']->id,
-                    'amount' => rand(3000, 15000),
-                    'date' => $formattedDate,
-                    'description' => 'Monthly Office utility bills and office supplies',
-                    'created_by' => $superAdmin->id
-                ]);
-            }
-
-            // Seed Daily operational logs for each active vehicle
-            foreach ($vehicles as $vehicle) {
-                if ($vehicle->status !== 'active') continue;
-
-                $driverId = $vehicle->assigned_driver_id;
-                $mainKm = rand(120, 250);
-                $localKm = rand(15, 60);
-                $dieselLiters = rand(30, 70);
-                $dieselAmount = $dieselLiters * 272.50; // standard price
-
-                $pasgiGiven = 0;
-                // Occasional Pasgi advance on daily logs
-                if (rand(1, 10) === 5) {
-                    $pasgiGiven = 5000;
-                    
-                    // Create Pasgi Advance record
-                    PasgiAdvance::create([
-                        'driver_id' => $driverId,
-                        'vehicle_id' => $vehicle->id,
-                        'amount' => $pasgiGiven,
-                        'date' => $formattedDate,
-                        'remarks' => 'Daily yard advance given for operational trip',
-                        'created_by' => $superAdmin->id
-                    ]);
-                }
-
-                FleetDailyData::create([
-                    'date' => $formattedDate,
-                    'vehicle_id' => $vehicle->id,
-                    'driver_id' => $driverId,
-                    'pasgi_given' => $pasgiGiven,
-                    'daily_diesel_amount' => $dieselAmount,
-                    'daily_diesel_liters' => $dieselLiters,
-                    'main_km' => $mainKm,
-                    'local_km' => $localKm,
-                    'remarks' => 'Daily operational log entry',
-                    'created_by' => $superAdmin->id
-                ]);
-
-                // Log the diesel cost under expenses to keep statistics correct
-                Expense::create([
-                    'category_id' => $expenseCats['Diesel Retail']->id,
-                    'amount' => $dieselAmount,
-                    'date' => $formattedDate,
-                    'description' => 'Diesel refuel ' . $dieselLiters . ' Liters for vehicle ' . $vehicle->vehicle_number,
-                    'vehicle_id' => $vehicle->id,
-                    'created_by' => $superAdmin->id
-                ]);
-            }
-        }
-
-        // 9. Seed some Maintenance logs
-        $maintenanceTypes = ['Mobile Oil', 'Filters', 'Tyres', 'Engine Repair'];
-        $vendors = ['Super Auto Workshop', 'Hino City Service', 'Tyre Point LHR', 'D-Max Car Spa'];
-
-        foreach ($vehicles as $vehicle) {
-            // Seed 2 maintenance logs per vehicle in the last 30 days
-            for ($m = 0; $m < 2; $m++) {
-                Maintenance::create([
-                    'vehicle_id' => $vehicle->id,
-                    'maintenance_date' => Carbon::now()->subDays(rand(5, 25))->toDateString(),
-                    'maintenance_type' => $maintenanceTypes[rand(0, 3)],
-                    'amount' => rand(8000, 35000),
-                    'vendor' => $vendors[rand(0, 3)],
-                    'invoice_number' => 'INV-' . rand(10000, 99999),
-                    'remarks' => 'Scheduled maintenance checks',
-                    'created_by' => $superAdmin->id
-                ]);
-            }
-        }
-
-        // 10. Seed some Store purchases
-        $items = ['Brake Pads', 'Air Filter', 'Engine Oil Drum', 'Wiper Blades', 'Tyre Tubes'];
-        for ($s = 0; $s < 5; $s++) {
-            StoreItem::create([
-                'item_name' => $items[$s],
-                'quantity' => rand(1, 5),
-                'amount' => rand(5000, 20000),
-                'date' => Carbon::now()->subDays(rand(5, 25))->toDateString(),
-                'vehicle_id' => $vehicles[rand(0, 4)]->id,
-                'vendor' => 'Auto Spare Parts Mart',
-                'remarks' => 'Item purchased for reserve store stock',
-                'created_by' => $superAdmin->id
-            ]);
-        }
-
-        // 11. Seed Driver Salaries for the previous month (e.g. July 2026)
-        $previousMonthStr = Carbon::now()->subMonth()->format('Y-m');
-        $paymentDate = Carbon::now()->subMonth()->endOfMonth()->toDateString();
-
-        foreach ($drivers as $driver) {
-            // Calculate total Pasgi advances in the previous month
-            $advancesAmount = PasgiAdvance::where('driver_id', $driver->id)
-                ->whereMonth('date', Carbon::now()->subMonth()->month)
-                ->sum('amount');
-
-            // Recover 50% of outstanding Pasgi advances
-            $pasgiRecovery = $advancesAmount > 0 ? $advancesAmount * 0.5 : 0;
-            $fine = rand(0, 2) === 1 ? rand(1000, 3000) : 0;
-            $gross = $driver->base_salary;
-
-            $salary = DriverSalary::create([
-                'driver_id' => $driver->id,
-                'salary_period' => $previousMonthStr,
-                'gross_salary' => $gross,
-                'fine' => $fine,
-                'pasgi_adjustment' => $pasgiRecovery,
-                'other_adjustment' => 0,
-                'payment_date' => $paymentDate,
-                'payment_status' => 'Paid',
-                'remarks' => 'Salary disbursed for period: ' . $previousMonthStr,
-                'created_by' => $superAdmin->id
-            ]);
-
-            // If Pasgi was recovered, create a Pasgi Adjustment record
-            if ($pasgiRecovery > 0) {
-                PasgiAdjustment::create([
-                    'driver_id' => $driver->id,
-                    'amount' => $pasgiRecovery,
-                    'date' => $paymentDate,
-                    'remarks' => 'Automatic recovery from salary for period: ' . $previousMonthStr,
-                    'salary_id' => $salary->id,
-                    'created_by' => $superAdmin->id
-                ]);
-            }
-
-            // Mapped as general expense
-            Expense::create([
-                'category_id' => $expenseCats['Staff Salary']->id,
-                'amount' => $salary->net_payable,
-                'date' => $paymentDate,
-                'description' => 'Driver salary payment to ' . $driver->name . ' for ' . $previousMonthStr,
-                'created_by' => $superAdmin->id
-            ]);
-        }
-
-        // 12. Seed Office Staff Employees
-        $employeesData = [
-            ['name' => 'Yaseen Ahmed', 'designation' => 'Yard Manager', 'contact' => '0300-1111111', 'base_salary' => 60000, 'status' => 'active'],
-            ['name' => 'Aisha Bibi', 'designation' => 'Accountant', 'contact' => '0312-2222222', 'base_salary' => 55000, 'status' => 'active'],
-            ['name' => 'Kamil Raza', 'designation' => 'Dispatcher', 'contact' => '0333-3333333', 'base_salary' => 45000, 'status' => 'active'],
-        ];
-
-        $employees = [];
-        foreach ($employeesData as $empData) {
-            $employees[] = Employee::firstOrCreate(['name' => $empData['name']], $empData);
-        }
-
-        // Seed some employee advances in the last month
-        foreach ($employees as $employee) {
-            if ($employee->name === 'Yaseen Ahmed' || $employee->name === 'Kamil Raza') {
-                EmployeeAdvance::create([
-                    'employee_id' => $employee->id,
-                    'amount' => 15000,
-                    'date' => Carbon::now()->subMonth()->startOfMonth()->addDays(5)->toDateString(),
-                    'remarks' => 'Salary advance given for personal medical expenses',
-                    'created_by' => $superAdmin->id
-                ]);
-            }
-        }
-
-        // Seed Employee Salaries for the previous month (July 2026)
-        foreach ($employees as $employee) {
-            $advancesAmount = EmployeeAdvance::where('employee_id', $employee->id)
-                ->whereMonth('date', Carbon::now()->subMonth()->month)
-                ->sum('amount');
-
-            $advanceRecovery = $advancesAmount > 0 ? $advancesAmount * 0.333 : 0;
-            $fine = ($employee->name === 'Kamil Raza') ? 1000 : 0;
-            $gross = $employee->base_salary;
-
-            $empSalary = EmployeeSalary::create([
-                'employee_id' => $employee->id,
-                'salary_period' => $previousMonthStr,
-                'gross_salary' => $gross,
-                'fine' => $fine,
-                'advance_adjustment' => $advanceRecovery,
-                'other_adjustment' => 0,
-                'payment_date' => $paymentDate,
-                'payment_status' => 'Paid',
-                'remarks' => 'Monthly staff salary disbursed',
-                'created_by' => $superAdmin->id
-            ]);
-
-            if ($advanceRecovery > 0) {
-                EmployeeAdjustment::create([
-                    'employee_id' => $employee->id,
-                    'amount' => $advanceRecovery,
-                    'date' => $paymentDate,
-                    'remarks' => 'Partial recovery from salary for period: ' . $previousMonthStr,
-                    'salary_id' => $empSalary->id,
-                    'created_by' => $superAdmin->id
-                ]);
-            }
-
-            Expense::create([
-                'category_id' => $expenseCats['Staff Salary']->id,
-                'amount' => $empSalary->net_payable,
-                'date' => $paymentDate,
-                'description' => 'Staff salary payment to ' . $employee->name . ' (' . $employee->designation . ') for ' . $previousMonthStr,
-                'employee_id' => $employee->id,
-                'created_by' => $superAdmin->id
-            ]);
-        }
     }
 }

@@ -23,6 +23,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\BranchController;
 
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -45,8 +46,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('daily-data', FleetDailyDataController::class)->parameters(['daily-data' => 'dailyLog'])->middleware('can:daily-data.view');
 
     // Financials
-    Route::resource('incomes', IncomeController::class)->middleware('can:finance.view');
-    Route::resource('expenses', ExpenseController::class)->middleware('can:finance.view');
+    Route::resource('incomes', IncomeController::class)->middleware('can:incomes.view');
+    Route::resource('expenses', ExpenseController::class)->middleware('can:expenses.view');
     Route::resource('maintenances', MaintenanceController::class)->middleware('can:maintenance.view');
     Route::resource('store-items', StoreItemController::class)->middleware('can:store.view');
 
@@ -103,5 +104,11 @@ Route::middleware('auth')->group(function () {
 
         // Activity logs
         Route::get('/logs',                               [\App\Http\Controllers\SuperAdminController::class, 'logs'])->name('logs.index');
+
+        // Branches management
+        Route::resource('branches', BranchController::class);
     });
+
+    // Branch switching
+    Route::post('/branches/switch', [BranchController::class, 'switchBranch'])->name('branches.switch');
 });

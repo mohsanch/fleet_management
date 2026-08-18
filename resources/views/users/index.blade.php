@@ -49,6 +49,7 @@
                 <tr>
                     <th>User Profile</th>
                     <th>User Type</th>
+                    <th>Branch</th>
                     <th>Assigned Roles</th>
                     <th>Status</th>
                     <th style="text-align: right;">Actions</th>
@@ -72,6 +73,17 @@
                         <span style="font-weight: 600; text-transform: capitalize; color: var(--text-color); font-size: 13px;">
                             {{ $user->user_type }}
                         </span>
+                    </td>
+                    <td>
+                        @if($user->branch)
+                            <span class="badge info" style="font-size: 10px;">
+                                {{ $user->branch->name }}
+                            </span>
+                        @else
+                            <span class="badge" style="background: #EDF2F7; color: #4A5568; font-size: 10px;">
+                                Global (All)
+                            </span>
+                        @endif
                     </td>
                     <td>
                         @forelse($user->roles as $role)

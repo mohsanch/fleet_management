@@ -35,6 +35,7 @@ class DriverController extends Controller
             'phone' => ['required', 'string', 'max:255'],
             'base_salary' => ['required', 'numeric', 'min:0'],
             'status' => ['required', 'string', 'in:active,inactive,suspended'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
 
         $driver = Driver::create([
@@ -43,6 +44,7 @@ class DriverController extends Controller
             'phone' => $request->phone,
             'base_salary' => $request->base_salary,
             'status' => $request->status,
+            'branch_id' => $request->branch_id,
         ]);
 
         if ($request->hasFile('attachment')) {
@@ -73,6 +75,7 @@ class DriverController extends Controller
             'phone' => ['required', 'string', 'max:255'],
             'base_salary' => ['required', 'numeric', 'min:0'],
             'status' => ['required', 'string', 'in:active,inactive,suspended'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
 
         $driver->update([
@@ -81,6 +84,7 @@ class DriverController extends Controller
             'phone' => $request->phone,
             'base_salary' => $request->base_salary,
             'status' => $request->status,
+            'branch_id' => $request->branch_id,
         ]);
 
         if ($request->hasFile('attachment')) {

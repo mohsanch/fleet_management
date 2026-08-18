@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\BelongsToBranch;
+
 class DriverSalary extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToBranch;
     protected $fillable = [
         'driver_id', 'salary_period', 'gross_salary', 'fine', 
         'pasgi_adjustment', 'other_adjustment', 'net_payable', 
-        'payment_date', 'payment_status', 'remarks', 'created_by'
+        'payment_date', 'payment_status', 'remarks', 'created_by', 'branch_id'
     ];
 
     protected static function boot()

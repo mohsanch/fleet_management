@@ -1117,7 +1117,9 @@ input:checked + .slider:before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #319795 0%, #1A202C 100%);
+    background-image: linear-gradient(135deg, rgba(49, 151, 149, 0.8) 0%, rgba(26, 32, 44, 0.95) 100%), url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=1000');
+    background-size: cover;
+    background-position: center;
     z-index: -1;
 }
 

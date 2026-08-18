@@ -6,12 +6,48 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title', 'Fleet Management') - Fleet Dashboard</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234fd1c5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2'/%3E%3Cpath d='M19 18h2a1 1 0 0 0 1-1v-5.14a2 2 0 0 0-.586-1.414l-2.83-2.83A2 2 0 0 0 17.17 7H14'/%3E%3Ccircle cx='7.5' cy='18.5' r='2.5'/%3E%3Ccircle cx='17.5' cy='18.5' r='2.5'/%3E%3C/svg%3E">
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="{{ asset('css/purity.css') }}">
+
+    <!-- Custom Branch Switcher Style -->
+    <style>
+        .branch-select-trigger {
+            display: inline-block;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 8px 35px 8px 16px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A5568' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 12px;
+            height: 38px;
+            line-height: 20px;
+            vertical-align: middle;
+            box-sizing: border-box;
+        }
+        .branch-select-trigger:hover, .branch-select-trigger:focus {
+            border-color: var(--primary);
+            box-shadow: 0px 4px 10px rgba(79, 209, 197, 0.1);
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -78,14 +114,17 @@
 
                 {{-- FINANCIALS --}}
                 @cannot('super-admin-only')
-                @can('finance.view')
+                @canany(['incomes.view', 'expenses.view'])
                 <li class="sidebar-section-label">Financials</li>
+                @can('incomes.view')
                 <li class="menu-item {{ Request::is('incomes*') ? 'active' : '' }}">
                     <a href="{{ route('incomes.index') }}">
                         <div class="icon-box"><i data-lucide="trending-up"></i></div>
                         <span>Income</span>
                     </a>
                 </li>
+                @endcan
+                @can('expenses.view')
                 <li class="menu-item {{ Request::is('expenses*') ? 'active' : '' }}">
                     <a href="{{ route('expenses.index') }}">
                         <div class="icon-box"><i data-lucide="credit-card"></i></div>
@@ -93,6 +132,7 @@
                     </a>
                 </li>
                 @endcan
+                @endcanany
                 @endcannot
 
                 {{-- PAYROLL --}}
@@ -208,6 +248,12 @@
                         <span>Permission Builder</span>
                     </a>
                 </li>
+                <li class="menu-item {{ Request::is('admin/branches*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.branches.index') }}">
+                        <div class="icon-box"><i data-lucide="map-pin"></i></div>
+                        <span>Branch Management</span>
+                    </a>
+                </li>
                 <li class="menu-item {{ Request::is('admin/logs*') ? 'active' : '' }}">
                     <a href="{{ route('admin.logs.index') }}">
                         <div class="icon-box"><i data-lucide="file-text"></i></div>
@@ -226,7 +272,7 @@
                 @endcan
                 @endcannot
                 @cannot('super-admin-only')
-                @can('manage-settings')
+                @can('settings.view')
                 <li class="menu-item {{ Request::is('settings*') ? 'active' : '' }}">
                     <a href="{{ route('settings.index') }}">
                         <div class="icon-box"><i data-lucide="settings"></i></div>
@@ -285,6 +331,23 @@
                 <div class="navbar-actions">
 
                     @auth
+                    <!-- Branch Selector / Indicator -->
+                    @if(in_array(auth()->user()->user_type, ['super_admin', 'admin']) && auth()->user()->branch_id === null)
+                        <form action="{{ route('branches.switch') }}" method="POST" id="branch-switch-form" style="margin-right: 15px; display: inline-block;">
+                            @csrf
+                            <select name="branch_id" onchange="document.getElementById('branch-switch-form').submit();" class="branch-select-trigger" style="margin: 0; width: auto; max-width: 180px;">
+                                <option value="all" {{ !session()->has('active_branch_id') ? 'selected' : '' }}>All Branches</option>
+                                @foreach(\App\Models\Branch::where('is_active', true)->get() as $b)
+                                    <option value="{{ $b->id }}" {{ session('active_branch_id') == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
+                                @endforeach
+                            </select>
+                        </form>
+                    @elseif(auth()->user()->branch_id !== null)
+                        <span class="badge info" style="margin-right: 15px; font-size: 11px; padding: 6px 12px; background: rgba(99,102,241,0.12); color: var(--primary); font-weight: 700; border-radius: 12px; border: 1px solid rgba(99,102,241,0.25);">
+                            Branch: {{ auth()->user()->branch->name }}
+                        </span>
+                    @endif
+
                     {{-- Profile / Settings Dropdown --}}
                     <div class="profile-dropdown" id="profileDropdown">
                         <button class="profile-trigger" id="profileTrigger" type="button">

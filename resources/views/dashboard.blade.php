@@ -58,7 +58,7 @@
 
 {{-- ─── Stats Cards Grid ────────────────────────────────────────────────── --}}
 <div class="stats-grid">
-    @can('finance.view')
+    @can('incomes.view')
     {{-- Total Income --}}
     <div class="card stat-card">
         <div class="stat-info">
@@ -70,7 +70,9 @@
         </div>
         <div class="stat-icon-box"><i data-lucide="trending-up"></i></div>
     </div>
+    @endcan
 
+    @can('expenses.view')
     {{-- Total Expenses --}}
     <div class="card stat-card">
         <div class="stat-info">
@@ -82,7 +84,9 @@
         </div>
         <div class="stat-icon-box"><i data-lucide="credit-card"></i></div>
     </div>
+    @endcan
 
+    @if(auth()->user()->can('incomes.view') && auth()->user()->can('expenses.view'))
     {{-- Net Profit --}}
     <div class="card stat-card">
         <div class="stat-info">
@@ -94,7 +98,9 @@
         </div>
         <div class="stat-icon-box"><i data-lucide="award"></i></div>
     </div>
+    @endif
 
+    @can('expenses.view')
     {{-- Total Diesel --}}
     <div class="card stat-card">
         <div class="stat-info">
@@ -146,7 +152,7 @@
         <div class="stat-icon-box"><i data-lucide="truck"></i></div>
     </div>
 
-    @can('finance.view')
+    @can('expenses.view')
     {{-- Pasgi Outstanding --}}
     <div class="card stat-card">
         <div class="stat-info">
@@ -175,8 +181,8 @@
 
 
 <!-- Charts Section -->
-<div class="charts-grid" style="{{ auth()->user()->can('finance.view') ? '' : 'grid-template-columns: 1fr;' }}">
-    @can('finance.view')
+<div class="charts-grid" style="{{ auth()->user()->can('incomes.view') ? '' : 'grid-template-columns: 1fr;' }}">
+    @can('incomes.view')
     <!-- Sales Overview / Profit & Expense Chart (Dark Card) -->
     <div class="card chart-card chart-card-dark">
         <div class="chart-header">
@@ -274,7 +280,7 @@
                 </a>
             @endcan
             
-            @can('finance.create')
+            @can('expenses.create')
                 @php $hasAnyCreate = true; @endphp
                 <a href="{{ route('expenses.create') }}" class="btn-action">
                     <span>Record General Expense</span>
@@ -391,7 +397,7 @@
 @endsection
 
 @section('scripts')
-@can('finance.view')
+@can('incomes.view')
 <!-- ApexCharts CDN -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>

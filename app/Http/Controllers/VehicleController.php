@@ -44,6 +44,7 @@ class VehicleController extends Controller
             'type' => ['nullable', 'string', 'max:255'],
             'assigned_driver_id' => ['nullable', 'exists:drivers,id'],
             'status' => ['required', 'string', 'in:active,inactive'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
 
         $vehicle = Vehicle::create($request->all());
@@ -85,6 +86,7 @@ class VehicleController extends Controller
             'type' => ['nullable', 'string', 'max:255'],
             'assigned_driver_id' => ['nullable', 'exists:drivers,id'],
             'status' => ['required', 'string', 'in:active,inactive'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
 
         $vehicle->update($request->all());

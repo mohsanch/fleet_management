@@ -14,10 +14,10 @@ class IncomeController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('can:view-financials', only: ['index', 'show']),
-            new Middleware('can:add-transactions', only: ['create', 'store']),
-            new Middleware('can:edit-transactions', only: ['edit', 'update']),
-            new Middleware('can:delete-transactions', only: ['destroy']),
+            new Middleware('can:incomes.view', only: ['index', 'show']),
+            new Middleware('can:incomes.create', only: ['create', 'store']),
+            new Middleware('can:incomes.edit', only: ['edit', 'update']),
+            new Middleware('can:incomes.delete', only: ['destroy']),
         ];
     }
 

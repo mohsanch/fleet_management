@@ -67,6 +67,23 @@
             @enderror
         </div>
 
+        @if(auth()->user()->branch_id === null)
+        <div class="form-group">
+            <label for="branch_id">Assign Branch</label>
+            <select name="branch_id" id="branch_id" class="form-input" style="height: 48px; padding: 10px 20px;">
+                <option value="">None (Global)</option>
+                @foreach(\App\Models\Branch::where('is_active', true)->get() as $b)
+                    <option value="{{ $b->id }}" {{ old('branch_id', $vehicle->branch_id) == $b->id ? 'selected' : '' }}>
+                        {{ $b->name }} ({{ $b->code }})
+                    </option>
+                @endforeach
+            </select>
+            @error('branch_id')
+                <span class="form-error">{{ $message }}</span>
+            @enderror
+        </div>
+        @endif
+
         
         @if($vehicle->attachments->count() > 0)
         <div class="form-group" style="margin-bottom: 20px;">

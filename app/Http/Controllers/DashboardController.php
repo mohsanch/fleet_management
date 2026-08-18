@@ -87,7 +87,7 @@ class DashboardController extends Controller
         $totalSalaries = $totalDriverSalaries + $totalEmployeeSalaries;
 
         $totalPasgiGiven     = PasgiAdvance::sum('amount');
-        $totalPasgiRecovered = PasgiAdjustment::sum('amount');
+        $totalPasgiRecovered = PasgiAdjustment::whereHas('driver')->sum('amount');
         $pasgiOutstanding    = max(0, $totalPasgiGiven - $totalPasgiRecovered);
 
         $totalKm = FleetDailyData::when($dateFrom, fn($q) => $q->whereDate('date', '>=', $dateFrom))
